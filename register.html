@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>註冊帳號</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+  <style>
+    .register-box {
+      max-width: 500px;
+      margin: 80px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    #strengthBar div {
+      height: 6px;
+      background: lightgray;
+      margin-top: 4px;
+    }
+    .strength-weak { background: red !important; }
+    .strength-medium { background: orange !important; }
+    .strength-strong { background: green !important; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="register-box">
+    <h3 class="text-center mb-4">註冊帳號</h3>
+    <div id="alert-box" class="alert d-none"></div>
+
+    <form id="registerForm">
+      <div class="mb-3">
+        <label class="form-label">帳號</label>
+        <input type="text" name="value1" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">密碼</label>
+        <input type="password" name="value2" id="password" class="form-control" required>
+        <div id="strengthBar"><div></div></div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">確認密碼</label>
+        <input type="password" id="confirmPassword" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">電話號碼</label>
+        <input type="text" name="value3" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="value4" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">地址</label>
+        <input type="text" name="value5" class="form-control" required>
+      </div>
+
+      <!-- 身份多選 -->
+      <div class="mb-3">
+        <label class="form-label">選擇身分（可複選）</label>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="roles[]" value="buyer" id="roleBuyer" checked>
+          <label class="form-check-label" for="roleBuyer">一般買家</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="roles[]" value="seller" id="roleSeller">
+          <label class="form-check-label" for="roleSeller">賣家</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="roles[]" value="admin" id="roleAdmin">
+          <label class="form-check-label" for="roleAdmin">後台管理者</label>
+        </div>
+      </div>
+
+      <!-- 管理者密碼 -->
+      <div class="mb-3 d-none" id="adminPasswordBox">
+        <label class="form-label">後台管理密碼</label>
+        <input type="password" name="admin_pass" id="admin_pass" class="form-control">
+      </div>
+
+      <!-- reCAPTCHA -->
+      <div class="mb-3">
+        <div class="g-recaptcha" data-sitekey="6LdCgFQrAAAAAK5t-HzC5_fa81y9AJOSvZMkdC5c"></div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">註冊</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // 密碼強度顯示
+  $('#password').on('input', function () {
+    const val = $(this).val(), bar = $('#strengthBar div');
+    bar.removeClass('strength-weak strength-medium strength-strong');
+    if (val.length < 6) bar.addClass('strength-weak').css('width', '30%');
+    else if (val.match(/[A-Z]/) && val.match(/[0-9]/)) bar.addClass('strength-strong').css('width', '100%');
+    else bar.addClass('strength-medium').css('width', '60%');
+  });
+
+  // 顯示/隱藏後台密碼欄位
+  $('input[name="roles[]"]').on('change', function () {
+    const adminChecked = $('#roleAdmin').is(':checked');
+    if (adminChecked) {
+      $('#adminPasswordBox').removeClass('d-none');
+      $('#admin_pass').attr('required', true);
+    } else {
+      $('#adminPasswordBox').addClass('d-none');
+      $('#admin_pass').removeAttr('required');
+    }
+  });
+
+  // AJAX 註冊送出
+  $('#registerForm').submit(function (e) {
+    e.preventDefault();
+
+    const pwd = $('#password').val();
+    const confirm = $('#confirmPassword').val();
+    if (pwd !== confirm) {
+      showAlert('兩次輸入的密碼不一致', 'danger');
+      return;
+    }
+
+    const recaptcha = grecaptcha.getResponse();
+    if (!recaptcha) {
+      showAlert('請完成驗證碼驗證', 'danger');
+      return;
+    }
+
+    const formData = $(this).serialize();
+    $('button[type=submit]').attr('disabled', true); // 防止重複送出
+
+    $.post('sign.php', formData, function (res) {
+      $('button[type=submit]').attr('disabled', false);
+      if (res.status === 'success') {
+        showAlert(res.message, 'success');
+        setTimeout(() => window.location.href = 'index_logout.php', 3000);
+      } else {
+        showAlert(res.message, 'danger');
+      }
+    }, 'json');
+  });
+
+  function showAlert(msg, type) {
+    $('#alert-box').removeClass('d-none alert-success alert-danger')
+                   .addClass('alert-' + type).text(msg);
+  }
+</script>
+
+</body>
+</html>

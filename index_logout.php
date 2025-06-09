@@ -33,8 +33,8 @@ session_start();
         <p>請先登入或註冊以使用本系統</p>
         <div class="actions">
             <!-- 訪客可選擇登入或註冊新帳號 -->
-            <a href="login.php">登入</a>
-            <a href="register.html">註冊帳號</a>
+            <a href="user/login.php">登入</a>
+            <a href="user/register.html">註冊帳號</a>
         </div>
     </div>
 </body>

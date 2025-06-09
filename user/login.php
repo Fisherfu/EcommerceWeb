@@ -21,7 +21,7 @@ if (isset($_POST['name'], $_POST['password'])) {
         } else {
             $_SESSION['user_logged_in'] = true;
             $_SESSION['user_name'] = $user['name'];
-            header("Location: index_login.php");
+            header("Location: ../index_login.php");
             exit;
         }
     }
@@ -123,7 +123,7 @@ if (isset($_POST['name'], $_POST['password'])) {
   </div>
 
   <div class="top-right">
-    <a href="adminLogin.html">後台登入</a>
+    <a href="../admin/adminLogin.html">後台登入</a>
   </div>
 
   <div class="container">

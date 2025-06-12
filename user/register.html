@@ -141,7 +141,7 @@
       $('button[type=submit]').attr('disabled', false);
       if (res.status === 'success') {
         showAlert(res.message, 'success');
-        setTimeout(() => window.location.href = 'index_logout.php', 3000);
+        setTimeout(() => window.location.href = '../index_logout.php', 3000);
       } else {
         showAlert(res.message, 'danger');
       }

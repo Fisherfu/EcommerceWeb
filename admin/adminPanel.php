@@ -41,7 +41,7 @@ $num_rows = mysqli_num_rows($result);
       <button class="btn btn-primary">搜尋</button>
     </div>
     <div class="col-auto">
-      <a href="admin_panel.php" class="btn btn-secondary">清除搜尋</a>
+      <a href="adminPanel.php" class="btn btn-secondary">清除搜尋</a>
     </div>
   </form>
 

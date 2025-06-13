@@ -21,7 +21,9 @@ if (isset($_POST['name'], $_POST['password'])) {
         } else {
             $_SESSION['user_logged_in'] = true;
             $_SESSION['user_name'] = $user['name'];
-            header("Location: ../index_login.php");
+            $_SESSION['user_id'] = $user['id'];
+            header("Location: ./user_allproduct.php");
+            //header("Location: ../index_login.php");
             exit;
         }
     }

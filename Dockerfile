@@ -1,24 +1,27 @@
-
-
-# Dockerfile for PHP + Apache + MySQLi
+#Use PHP 8.2 with Apache
 FROM php:8.2-apache
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-RUN docker-php-ext-install mysqli
+# Install system dependencies and PHP extensions
+RUN apt-get update && apt-get install -y \
+    libpng-dev \
+    libjpeg-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    && docker-php-ext-install mysqli
 
-# Install mysqli extension
-RUN docker-php-ext-install mysqli
-
-# Copy project files to Apache document root
+# Copy app source code
 COPY . /var/www/html/
 
 # Set working directory
 WORKDIR /var/www/html/
 
-# Fix permissions (optional)
+# Set permissions (optional)
 RUN chown -R www-data:www-data /var/www/html/
 
-# Expose port 80
+# Expose Apache port
 EXPOSE 80

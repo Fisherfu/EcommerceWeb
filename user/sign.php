@@ -10,15 +10,15 @@ function response($status, $message) {
 }
 
 // 檢查 reCAPTCHA
-$secretKey = "6LdCgFQrAAAAALbhcL1NbX8q3hZl-p2Naj9lWbs-";
-$recaptcha = $_POST['g-recaptcha-response'];
-$verifyURL = "https://www.google.com/recaptcha/api/siteverify";
-$verifyResponse = file_get_contents("$verifyURL?secret=$secretKey&response=$recaptcha");
-$responseData = json_decode($verifyResponse);
+//$secretKey = "6LdCgFQrAAAAALbhcL1NbX8q3hZl-p2Naj9lWbs-";
+//$recaptcha = $_POST['g-recaptcha-response'];
+//$verifyURL = "https://www.google.com/recaptcha/api/siteverify";
+//$verifyResponse = file_get_contents("$verifyURL?secret=$secretKey&response=$recaptcha");
+//$responseData = json_decode($verifyResponse);
 
-if (!$responseData->success) {
-    response('error', '驗證碼驗證失敗');
-}
+//if (!$responseData->success) {
+//    response('error', '驗證碼驗證失敗');
+//}
 
 $name  = trim($_POST['value1'] ?? '');
 $pwd   = trim($_POST['value2'] ?? '');

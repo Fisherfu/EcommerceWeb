@@ -1,14 +1,13 @@
 <?php
 $host = "sql12.freesqldatabase.com";
 $username = "sql12786152";
-$password = "Ig5nlVxRrT"; // make sure it is correct and up to date
+$password = "Ig5nlVxRrT";
 $dbname = "sql12786152";
 
-// Connect
-$conn = mysqli_connect($host, $username, $password, $dbname);
+// Make sure to use $link
+$link = mysqli_connect($host, $username, $password, $dbname);
 
-// Check
-if (!$conn) {
+if (!$link) {
     die("Connection failed: " . mysqli_connect_error());
 }
 ?>

@@ -1,35 +1,41 @@
 <?php
 session_start();
 
-$name = $password = "";
-$error = "";
+// Include DB config
+require_once '../config.php'; // Make sure this sets $link
 
+// Check if form is submitted
 if (isset($_POST['name'], $_POST['password'])) {
     $name = trim($_POST['name']);
     $password = trim($_POST['password']);
 
-    #$link = mysqli_connect('localhost', 'root', '', 'db') or die('DB 連線失敗');
-    require_once("../config.php");
-    $sql = "SELECT * FROM account WHERE name = '$name' AND (is_seller = 1 OR is_buyer = 1)";
+    // Check if connection is established
+    if (!$link) {
+        die("Database connection failed: " . mysqli_connect_error());
+    }
+
+    // Escape input to prevent SQL injection
+    $name = mysqli_real_escape_string($link, $name);
+    $password = mysqli_real_escape_string($link, $password);
+
+    // Query to check login
+    $sql = "SELECT * FROM account WHERE name = '$name' AND password = '$password'";
     $result = mysqli_query($link, $sql);
 
-    if (!$result || mysqli_num_rows($result) === 0) {
-        $error = '帳號不存在或尚未開通使用權限';
+    if (mysqli_num_rows($result) == 1) {
+        $_SESSION['name'] = $name;
+        header("Location: ../index_login.php");
+        exit();
     } else {
-        $user = mysqli_fetch_assoc($result);
-        if (!password_verify($password, $user['password'])) {
-            $error = '密碼錯誤';
-        } else {
-            $_SESSION['user_logged_in'] = true;
-            $_SESSION['user_name'] = $user['name'];
-            $_SESSION['user_id'] = $user['id'];
-            header("Location: ./user_allproduct.php");
-            //header("Location: ../index_login.php");
-            exit;
-        }
+        echo "<script>alert('帳號或密碼錯誤！'); window.location.href='login.php';</script>";
+        exit();
     }
-    mysqli_close($link);
+} else {
+    echo "<script>alert('請輸入帳號和密碼'); window.location.href='login.php';</script>";
+    exit();
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="zh-Hant">

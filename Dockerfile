@@ -1,14 +1,13 @@
-# Use official PHP + Apache image
-FROM php:7.4-apache
+FROM php:8.2-apache
 
-# Enable Apache mod_rewrite (optional, for .htaccess)
-RUN a2enmod rewrite
+# Install mysqli extension
+RUN docker-php-ext-install mysqli
 
-# Copy project files into web root
+# Copy source files to Apache root
 COPY . /var/www/html/
 
-# Set proper permissions (optional)
+# Set correct permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Expose port for Render (Render maps it to 10000)
-EXPOSE 80
+# Enable Apache rewrite module if needed
+RUN a2enmod rewrite

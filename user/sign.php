@@ -54,9 +54,9 @@ if (!preg_match('/^[0-9]{8,15}$/', $phone)) {
 }
 
 // Update the connection to the remote database
-$link = mysqli_connect('sql12.freesqldatabase.com', 'sql12786152', 'your_password', 'sql12786152'); // Update credentials
+$link = mysqli_connect('sql12.freesqldatabase.com', 'sql12786152', 'Ig5nlVxRrT', 'sql12786152'); // Update credentials
 if (!$link) {
-    response('error', '数据库连接失败');
+    response('error', '數據庫連線失敗');
 }
 
 // Use prepared statements to prevent SQL injection

@@ -8,7 +8,8 @@ if (isset($_POST['name'], $_POST['password'])) {
     $name = trim($_POST['name']);
     $password = trim($_POST['password']);
 
-    $link = mysqli_connect('localhost', 'root', '', 'db') or die('DB 連線失敗');
+    #$link = mysqli_connect('localhost', 'root', '', 'db') or die('DB 連線失敗');
+    require_once("../config.php");
     $sql = "SELECT * FROM account WHERE name = '$name' AND (is_seller = 1 OR is_buyer = 1)";
     $result = mysqli_query($link, $sql);
 

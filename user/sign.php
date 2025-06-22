@@ -12,16 +12,15 @@ function response($status, $message) {
     exit;
 }
 
-// 檢查 reCAPTCHA
-//$secretKey = "6LdCgFQrAAAAALbhcL1NbX8q3hZl-p2Naj9lWbs-";
-//$recaptcha = $_POST['g-recaptcha-response'];
-//$verifyURL = "https://www.google.com/recaptcha/api/siteverify";
-//$verifyResponse = file_get_contents("$verifyURL?secret=$secretKey&response=$recaptcha");
-//$responseData = json_decode($verifyResponse);
-
-//if (!$responseData->success) {
-//    response('error', '驗證碼驗證失敗');
-//}
+// 检查 reCAPTCHA
+// $secretKey = "your-secret-key";
+// $recaptcha = $_POST['g-recaptcha-response'];
+// $verifyURL = "https://www.google.com/recaptcha/api/siteverify";
+// $verifyResponse = file_get_contents("$verifyURL?secret=$secretKey&response=$recaptcha");
+// $responseData = json_decode($verifyResponse);
+// if (!$responseData->success) {
+//    response('error', '验证码验证失败');
+// }
 
 $name  = trim($_POST['value1'] ?? '');
 $pwd   = trim($_POST['value2'] ?? '');
@@ -34,41 +33,52 @@ $is_buyer = in_array('buyer', $roles) ? 1 : 0;
 $is_seller = in_array('seller', $roles) ? 1 : 0;
 $is_admin = in_array('admin', $roles) ? 1 : 0;
 
-// 驗證管理密碼（如果有勾 admin）
+// 验证管理员密码（如果勾选了admin）
 $admin_pass = trim($_POST['admin_pass'] ?? '');
 $adminSecret = 'bear1234';
 
 if ($is_admin && $admin_pass !== $adminSecret) {
-    response('error', '後台管理密碼錯誤，無法註冊為管理者');
+    response('error', '后台管理密码错误，无法注册为管理员');
 }
+
 if (!$name || !$pwd || !$phone || !$email || !$addr) {
-    response('error', '請填寫所有欄位');
+    response('error', '请填写所有字段');
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    response('error', 'Email 格式錯誤');
+    response('error', 'Email 格式错误');
 }
 
 if (!preg_match('/^[0-9]{8,15}$/', $phone)) {
-    response('error', '電話號碼格式錯誤');
+    response('error', '电话号码格式错误');
 }
 
-$link = mysqli_connect('localhost', 'root', '', 'db');
-if (!$link) response('error', '資料庫連線失敗');
+// Update the connection to the remote database
+$link = mysqli_connect('sql12.freesqldatabase.com', 'sql12786152', 'your_password', 'sql12786152'); // Update credentials
+if (!$link) {
+    response('error', '数据库连接失败');
+}
 
-$result = mysqli_query($link, "SELECT * FROM account WHERE name = '$name'");
+// Use prepared statements to prevent SQL injection
+$stmt = $link->prepare("SELECT * FROM account WHERE name = ?");
+$stmt->bind_param("s", $name);
+$stmt->execute();
+$result = $stmt->get_result();
+
 if (mysqli_num_rows($result) >= 1) {
-    response('error', '帳號已存在');
+    response('error', '账户已存在');
 }
 
 $hashedPwd = password_hash($pwd, PASSWORD_BCRYPT);
 
-$sql = "INSERT INTO account (name, password, phone, email, address, is_buyer, is_seller, is_admin)
-        VALUES ('$name', '$hashedPwd', '$phone', '$email', '$addr', '$is_buyer', '$is_seller', '$is_admin')";
+$stmt = $link->prepare("INSERT INTO account (name, password, phone, email, address, is_buyer, is_seller, is_admin)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("sssssiii", $name, $hashedPwd, $phone, $email, $addr, $is_buyer, $is_seller, $is_admin);
 
-// $sql = ""
-if (mysqli_query($link, $sql)) {
-    response('success', '註冊成功！3 秒後自動跳轉');
+if ($stmt->execute()) {
+    response('success', '注册成功！3秒后自动跳转');
 } else {
-    response('error', '資料寫入失敗');
+    response('error', '数据写入失败');
 }
+
+?>

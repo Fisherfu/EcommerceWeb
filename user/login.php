@@ -15,18 +15,24 @@ if (isset($_POST['name']) && isset($_POST['password'])) {
         exit();
     }
 
-    // Escape inputs to prevent SQL injection
-    $name = mysqli_real_escape_string($link, $name);
-    $password = mysqli_real_escape_string($link, $password);
-
-    // Prepare and execute query
-    $sql = "SELECT * FROM account WHERE name='$name' AND password='$password'";
-    $result = mysqli_query($link, $sql);
+    // Use prepared statement to prevent SQL injection
+    $stmt = $link->prepare("SELECT * FROM account WHERE name = ?");
+    $stmt->bind_param("s", $name); // "s" means string
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     // Check for matching user
-    if (mysqli_num_rows($result) === 1) {
-        $_SESSION['name'] = $name;
-        echo "<script>alert('登入成功'); location.href='../index_product.php';</script>";
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            // Password is correct, start session
+            $_SESSION['name'] = $name;
+            echo "<script>alert('登入成功'); location.href='../index_product.php';</script>";
+        } else {
+            echo "<script>alert('帳號或密碼錯誤'); location.href='index_login.php';</script>";
+        }
     } else {
         echo "<script>alert('帳號或密碼錯誤'); location.href='index_login.php';</script>";
     }
@@ -34,6 +40,7 @@ if (isset($_POST['name']) && isset($_POST['password'])) {
     echo "<script>alert('請輸入帳號和密碼'); location.href='index_login.php';</script>";
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -134,9 +141,6 @@ if (isset($_POST['name']) && isset($_POST['password'])) {
 
   <div class="container">
     <h1>使用者登入</h1>
-    <?php if ($error): ?>
-      <p class="error"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
     <form action="login.php" method="post">
       <div class="form-group">
         <label for="name">帳號</label>

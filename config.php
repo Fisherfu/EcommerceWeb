@@ -1,7 +1,3 @@
-
-
-
-
 <?php
 $DB_HOST = 'sql12.freesqldatabase.com';
 $DB_USER = 'sql12786152';

@@ -1,22 +1,13 @@
 <?php
-$DB_HOST = 'sql12.freesqldatabase.com';
-$DB_USER = 'sql12786152';
-$DB_PASS = 'lg5nIVxRrT';
-$DB_NAME = 'sql12786152';
-$DB_PORT = 3306; // Optional but explicit
+$host = "sql12.freesqldatabase.com";
+$username = "sql12786152";
+$password = "lg5nIVxRrT";
+$dbname = "sql12786152";
 
-// 建立連線並加上錯誤訊息
-$link = mysqli_connect($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_PORT);
+$conn = mysqli_connect($host, $username, $password, $dbname);
 
-if (!$link) {
-    // 印出詳細的錯誤資訊
-    die("DB 連線失敗：<br>" .
-        "Host: {$DB_HOST}<br>" .
-        "User: {$DB_USER}<br>" .
-        "DB: {$DB_NAME}<br>" .
-        "Error: " . mysqli_connect_error());
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 ?>
-
-
-

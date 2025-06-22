@@ -117,6 +117,8 @@
     }
   });
 
+
+  /*
   // AJAX 註冊送出
   $('#registerForm').submit(function (e) {
     e.preventDefault();
@@ -146,7 +148,56 @@
         showAlert(res.message, 'danger');
       }
     }, 'json');
+  });      */
+   
+  // AJAX 註冊送出
+$('#registerForm').submit(function (e) {
+  e.preventDefault();
+
+  const pwd = $('#password').val();
+  const confirm = $('#confirmPassword').val();
+  if (pwd !== confirm) {
+    showAlert('兩次輸入的密碼不一致', 'danger');
+    return;
+  }
+
+  // const recaptcha = grecaptcha.getResponse();
+  // if (!recaptcha) {
+  //   showAlert('請完成驗證碼驗證', 'danger');
+  //   return;
+  // }
+
+  const formData = $(this).serialize();
+  $('button[type=submit]').attr('disabled', true); // 防止重複送出
+
+  console.log("📤 Sending data:", formData);
+
+  $.ajax({
+    url: 'sign.php',
+    type: 'POST',
+    data: formData,
+    dataType: 'json',
+    success: function (res) {
+      $('button[type=submit]').attr('disabled', false);
+      console.log("✅ Received:", res);
+      if (res.status === 'success') {
+        showAlert(res.message || '註冊成功', 'success');
+        setTimeout(() => {
+          window.location.href = '../index_logout.php';
+        }, 3000);
+      } else {
+        showAlert(res.message || '註冊失敗', 'danger');
+      }
+    },
+    error: function (xhr, status, error) {
+      $('button[type=submit]').attr('disabled', false);
+      console.error("❌ AJAX error:", status, error);
+      console.error("🧾 Raw response:", xhr.responseText);
+      showAlert("註冊時發生錯誤，請稍後再試。", 'danger');
+    }
   });
+});
+
 
   function showAlert(msg, type) {
     $('#alert-box').removeClass('d-none alert-success alert-danger')

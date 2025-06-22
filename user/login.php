@@ -1,41 +1,38 @@
 <?php
 session_start();
 
-// Include DB config
-require_once '../config.php'; // Make sure this sets $link
+// Absolute path to config.php
+require_once dirname(__DIR__) . '/config.php';
 
-// Check if form is submitted
-if (isset($_POST['name'], $_POST['password'])) {
+// Check if username and password are set
+if (isset($_POST['name']) && isset($_POST['password'])) {
     $name = trim($_POST['name']);
     $password = trim($_POST['password']);
 
-    // Check if connection is established
-    if (!$link) {
-        die("Database connection failed: " . mysqli_connect_error());
+    // Validate non-empty input
+    if ($name === '' || $password === '') {
+        echo "<script>alert('請輸入帳號和密碼'); location.href='index_login.php';</script>";
+        exit();
     }
 
-    // Escape input to prevent SQL injection
+    // Escape inputs to prevent SQL injection
     $name = mysqli_real_escape_string($link, $name);
     $password = mysqli_real_escape_string($link, $password);
 
-    // Query to check login
-    $sql = "SELECT * FROM account WHERE name = '$name' AND password = '$password'";
+    // Prepare and execute query
+    $sql = "SELECT * FROM account WHERE name='$name' AND password='$password'";
     $result = mysqli_query($link, $sql);
 
-    if (mysqli_num_rows($result) == 1) {
+    // Check for matching user
+    if (mysqli_num_rows($result) === 1) {
         $_SESSION['name'] = $name;
-        header("Location: ../index_login.php");
-        exit();
+        echo "<script>alert('登入成功'); location.href='../index_product.php';</script>";
     } else {
-        echo "<script>alert('帳號或密碼錯誤！'); window.location.href='login.php';</script>";
-        exit();
+        echo "<script>alert('帳號或密碼錯誤'); location.href='index_login.php';</script>";
     }
 } else {
-    echo "<script>alert('請輸入帳號和密碼'); window.location.href='login.php';</script>";
-    exit();
+    echo "<script>alert('請輸入帳號和密碼'); location.href='index_login.php';</script>";
 }
-
-
 ?>
 <!DOCTYPE html>
 <html lang="zh-Hant">
